@@ -12,31 +12,52 @@
         
        
         
-        function MyPromise(excutor) {
-            var self = this
-            self.onResolvedCallback = []
-            function resolve(value) {
-                setTimeout(() => {
-                    self.data = value
-                    self.onResolvedCallback.forEach(callback => callback(value))
-                })
-            }
-            excutor(resolve.bind(self))
-        }
-        MyPromise.prototype.then = function (onResolved) {
-            var self = this
-            return new MyPromise(resolve => {
-                self.onResolvedCallback.push(function () {
-                    var result = onResolved(self.data)
-                    if (result instanceof MyPromise) {
-                        result.then(resolve)
-                    } else {
-                        resolve(result)
-                    }
-                })
-            })
-        }
+        // function MyPromise(excutor) {
+        //     var self = this
+        //     self.onResolvedCallback = []
+        //     function resolve(value) {
+        //         setTimeout(() => {
+        //             self.data = value
+        //             self.onResolvedCallback.forEach(callback => callback(value))
+        //         })
+        //     }
+        //     excutor(resolve.bind(self))
+        // }
+        // MyPromise.prototype.then = function (onResolved) {
+        //     var self = this
+        //     return new MyPromise(resolve => {
+        //         self.onResolvedCallback.push(function () {
+        //             var result = onResolved(self.data)
+        //             if (result instanceof MyPromise) {
+        //                 result.then(resolve)
+        //             } else {
+        //                 resolve(result)
+        //             }
+        //         })
+        //     })
+        // }
         
+        function MyPromise(excutor){
+            var _this = this
+            this.callbacks = []
+            function rs(val){
+                setTimeout(function(){
+                    _this.callbacks.forEach(function(callback){
+                    callback(val)
+                })
+                },0)
+            }
+            excutor(rs)
+        }
+        MyPromise.prototype.then = function(fn){
+            this.callbacks.push(fn)
+        }
+        // var a = new MyPromise(function(rs){
+           
+        // })
+        // a.then(function(rs){
+        //     console.log(rs)
+        // })
         function ajax(options) {
             return new MyPromise(function (rs, rj) {
                 var request = new XMLHttpRequest()
